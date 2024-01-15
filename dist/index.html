@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <style>
+        .area {
+            width: 45em;
+            padding: 15px;
+            border: 1px solid #333;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        #drop_zone {
+            border: 2px dashed #bbb;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            padding: 50px;
+            text-align: center;
+            font: 21pt bold arial;
+            color: #bbb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="area">
+        <div id="drop_zone">Drop all files and folders for your glTF asset here</div>
+    </div>
+    <div id="download">
+        <a href="#" id="downloadLink"></a>
+    </div>
+    <div>
+        <ul id=list></ul>
+    </div>
+    <canvas id="myCanvas"></canvas>
+    <script src="main.js"></script>
+</body>
+
+</html>
