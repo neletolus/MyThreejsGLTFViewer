@@ -3,10 +3,9 @@ import { loadGLB } from "./renderView";
  * GLTFファイルと必要なファイル群をGLBにまとめる処理のjs
  */
 let gltf: any;
+let glb: File | null;
 let fileblobs: any = [];
-let files: File[] = [];
 let remainingfilestoprocess = 0;
-let glbfilename: string = "";
 
 let outputBuffers: ArrayBuffer[] = [];
 let bufferMap: Map<number, number> = new Map();
@@ -19,15 +18,6 @@ const gltfMimeTypes: any = {
     'image/vnd-ms.dds': ['dds']
 };
 
-function addDownloadButton(): void {
-    const btn = document.createElement("button");
-    btn.id = "downloadBtn";
-    btn.disabled = true;
-    btn.onclick = startDownload;
-    btn.appendChild(document.createTextNode("Processing..."));
-    document.getElementById("download")?.appendChild(btn);
-}
-
 export function handleDragOver(event: DragEvent): void {
     event.stopPropagation();
     event.preventDefault();
@@ -39,8 +29,7 @@ export function handleDragOver(event: DragEvent): void {
 export function handleFileSelect(event: DragEvent): void {
     event.stopPropagation();
     event.preventDefault();
-    document.getElementById('list')!!.innerHTML = "";
-    addDownloadButton();
+    document.getElementById('drop_zone_text')!!.innerHTML = "";
     const items = event.dataTransfer?.items;
     if (items == null) return
 
@@ -53,24 +42,17 @@ export function handleFileSelect(event: DragEvent): void {
     }
 }
 
-function startDownload(): void {
-    document.getElementById("downloadLink")?.click();
-}
-
 function traverseFileTree(item: FileSystemEntry, path: string | null): void {
     path = path || "";
     if (item.isFile) {
         (item as FileSystemFileEntry).file(function (file: File) {
-            files.push(file);
-            const lastModifiedDate = new Date(file.lastModified).toLocaleDateString("ja-jp")
-            const fileitem = '<li><strong>' + escape(file.name) + '</strong> (' + file.type + ') - ' +
-                file.size + ' bytes, last modified: ' + lastModifiedDate +
-                '</li>';
-            document.getElementById('list')!!.innerHTML += fileitem;
+            document.getElementById('drop_zone_text')!!.innerHTML += "<span>" + file.name + "</span>";
 
             const extension = file.name.split('.').pop();
-            if (extension === "gltf") {
-                glbfilename = file.name.substr(file.name.lastIndexOf('/') + 1, file.name.lastIndexOf('.'));
+            if (extension === "glb") {
+                glb = file;
+                checkRemaining();
+            } else if (extension === "gltf") {
                 const reader = new FileReader();
                 reader.readAsText(file);
                 reader.onload = function (event) {
@@ -82,7 +64,7 @@ function traverseFileTree(item: FileSystemEntry, path: string | null): void {
                 const reader = new FileReader();
                 reader.onload = (function (theFile) {
                     return function (e) {
-                        console.log(e!!.target!!.result);
+                        console.log(fileblobs);
 
                         fileblobs[theFile.name.toLowerCase()] = (e!!.target!!.result);
                         checkRemaining();
@@ -108,12 +90,22 @@ function traverseFileTree(item: FileSystemEntry, path: string | null): void {
 
 function checkRemaining(): void {
     remainingfilestoprocess--;
-    if (remainingfilestoprocess === 0) {
+    if (remainingfilestoprocess === 0 && glb) {
+        loadGLB(URL.createObjectURL(glb));
+        resetVariables();
+    } else if (remainingfilestoprocess === 0) {
         outputBuffers = [];
         bufferMap = new Map();
         bufferOffset = 0;
         processBuffers().then(fileSave);
     }
+}
+
+function resetVariables() {
+    gltf = null;
+    glb = null;
+    fileblobs = [];
+    remainingfilestoprocess = 0;
 }
 
 function processBuffers() {
@@ -233,9 +225,9 @@ function fileSave() {
             thisbufindex++;
         }
     }
-    const a = document.getElementById("downloadLink") as HTMLAnchorElement;
     const file = new Blob([finalBuffer], { type: 'model/json-binary' });
     loadGLB(URL.createObjectURL(file));
+    resetVariables();
 }
 
 function isBase64(uri: string): any {
