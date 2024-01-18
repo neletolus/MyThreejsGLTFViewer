@@ -7,14 +7,49 @@
 </head>
 
 <body>
-    <div class="area">
-        <a id="drop_menu" class="opened">
+    <div class="drop_area">
+        <a id="drop_menu">
             ドラッグアンドドロップ
         </a>
-        <div id="drop_zone">
+        <div id="drop_zone" class="hidden">
             <img src="./img/upload_icon.png" alt="ファイルをアップロード">
             <p id="drop_zone_text">ここにGLBファイル単体 or GLTFとその関連ファイルが含まれるディレクトリをドラッグ&ドロップしてください。</p>
         </div>
+    </div>
+    <div class="option_area">
+        <ul id="optionList">
+            <li>
+                <dl>
+                    <dt>操作説明</dt>
+                    <dd>
+                        サンプルテキスト
+                    </dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>HDRの切り替え</dt>
+                    <dd>
+                        <div>
+                            <input type="radio" id="empty_workshop_4k" name="hdr" value="0" checked />
+                            <label for="empty_workshop_4k">empty_workshop_4k.hdr</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="lilienstein_4k" name="hdr" value="1" />
+                            <label for="lilienstein_4k">lilienstein_4k.hdr</label>
+                        </div>
+                    </dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>アニメーションの切り替え</dt>
+                    <dd id="animations">
+                        <div><label><input type="radio" name="animations" value="-1" checked />初期状態</label></div>
+                    </dd>
+                </dl>
+            </li>
+        </ul>
     </div>
     <canvas id="myCanvas"></canvas>
     <script src="main.js"></script>

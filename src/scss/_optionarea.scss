@@ -1,0 +1,55 @@
+.option_area {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    width: 300px;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+#optionList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    color: #000;
+    font-size: 14px;
+
+    dl {
+        position: relative;
+
+        dt {
+            padding: 5px 5px 5px 10px;
+
+            &::before {
+                content: "";
+                position: absolute;
+                display: block;
+                top: 9px;
+                left: 0;
+                box-sizing: border-box;
+                width: 5px;
+                height: 5px;
+                border: 5px solid rgba(0, 0, 0, 0);
+                border-left: 5px solid #000;
+            }
+
+            &.opened {
+                &::before {
+                    content: "";
+                    position: absolute;
+                    display: block;
+                    top: 14px;
+                    left: 0;
+                    box-sizing: border-box;
+                    width: 5px;
+                    height: 5px;
+                    border: 5px solid rgba(0, 0, 0, 0);
+                    border-top: 5px solid #000;
+                }
+            }
+        }
+    }
+
+}
