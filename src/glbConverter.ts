@@ -109,47 +109,52 @@ function resetVariables() {
 }
 
 function processBuffers() {
-    const pendingBuffers = gltf.buffers.map(function (buffer: any, bufferIndex: number) {
-        return dataFromUri(buffer)
-            .then(function (data: any) {
-                if (data !== undefined) {
-                    outputBuffers.push(data);
-                }
-                delete buffer.uri;
-                buffer.byteLength = data.byteLength;
-                bufferMap.set(bufferIndex, bufferOffset);
-                bufferOffset += alignedLength(data.byteLength);
-            });
-    });
-
-    return Promise.all(pendingBuffers)
-        .then(function () {
-            let bufferIndex = gltf.buffers.length;
-            const images = gltf.images || [];
-            const pendingImages = images.map(function (image: any) {
-                return dataFromUri(image).then(function (data: any) {
-                    if (data === undefined) {
-                        delete image['uri'];
-                        return;
+    try {
+        const pendingBuffers = gltf.buffers.map(function (buffer: any, bufferIndex: number) {
+            return dataFromUri(buffer)
+                .then(function (data: any) {
+                    if (data !== undefined) {
+                        outputBuffers.push(data);
                     }
-                    const bufferView = {
-                        buffer: 0,
-                        byteOffset: bufferOffset,
-                        byteLength: data.byteLength,
-                    };
+                    delete buffer.uri;
+                    buffer.byteLength = data.byteLength;
                     bufferMap.set(bufferIndex, bufferOffset);
-                    bufferIndex++;
                     bufferOffset += alignedLength(data.byteLength);
-                    const bufferViewIndex = gltf.bufferViews.length;
-                    gltf.bufferViews.push(bufferView);
-                    outputBuffers.push(data);
-                    image['bufferView'] = bufferViewIndex;
-                    image['mimeType'] = getMimeType(image.uri);
-                    delete image['uri'];
                 });
-            });
-            return Promise.all(pendingImages);
         });
+
+        return Promise.all(pendingBuffers)
+            .then(function () {
+                let bufferIndex = gltf.buffers.length;
+                const images = gltf.images || [];
+                const pendingImages = images.map(function (image: any) {
+                    return dataFromUri(image).then(function (data: any) {
+                        if (data === undefined) {
+                            delete image['uri'];
+                            return;
+                        }
+                        const bufferView = {
+                            buffer: 0,
+                            byteOffset: bufferOffset,
+                            byteLength: data.byteLength,
+                        };
+                        bufferMap.set(bufferIndex, bufferOffset);
+                        bufferIndex++;
+                        bufferOffset += alignedLength(data.byteLength);
+                        const bufferViewIndex = gltf.bufferViews.length;
+                        gltf.bufferViews.push(bufferView);
+                        outputBuffers.push(data);
+                        image['bufferView'] = bufferViewIndex;
+                        image['mimeType'] = getMimeType(image.uri);
+                        delete image['uri'];
+                    });
+                });
+                return Promise.all(pendingImages);
+            });
+    } catch (error) {
+        alert("ファイルを読み込めませんでした。");
+        throw error;
+    }
 }
 
 function fileSave() {

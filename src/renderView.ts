@@ -5,10 +5,16 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
+import Stats from 'three/examples/jsm/libs/stats.module';
 
 let scene: THREE.Scene | null = null;
 let currentGLB: any;
 let camera: THREE.PerspectiveCamera | null = null;
+let renderer: THREE.WebGLRenderer | null = null;
+let model: THREE.Group<THREE.Object3DEventMap> | null = null;
+let animations: THREE.AnimationClip[];
+let mixer: THREE.AnimationMixer;
+let action: THREE.AnimationAction;
 
 export function renderView() {
     // サイズを指定
@@ -19,7 +25,7 @@ export function renderView() {
     const canvasElement = document.querySelector(
         "#myCanvas"
     ) as HTMLCanvasElement;
-    const renderer = new THREE.WebGLRenderer({
+    renderer = new THREE.WebGLRenderer({
         canvas: canvasElement,
     });
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -28,17 +34,7 @@ export function renderView() {
     // シーンを作成
     scene = new THREE.Scene();
 
-    new RGBELoader()
-        .setPath('hdr/')
-        .load('lilienstein_4k.hdr', function (texture) {
-
-            texture.mapping = THREE.EquirectangularReflectionMapping;
-
-            scene!!.background = texture;
-            scene!!.environment = texture;
-
-        });
-
+    loadHDR(null);
 
     // カメラを作成
     camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
@@ -58,16 +54,64 @@ export function renderView() {
     const ambientLight = new THREE.AmbientLight(0xffffff);
     scene.add(ambientLight);
 
+    const stats = new Stats();
+    stats.showPanel(0);
+    document.body.appendChild(stats.dom);
+    const clock = new THREE.Clock();
 
 
     tick();
 
+    // 画面のリサイズに合わせてキャンバスをリサイズ
+    window.addEventListener('resize', onWindowResize, false);
+
     // 毎フレーム時に実行されるループイベントです
     function tick() {
+        // fps情報
+        stats.begin();
+        stats.end();
         // レンダリング
-        renderer.render(scene!!, camera!!);
+        renderer!!.render(scene!!, camera!!);
         requestAnimationFrame(tick);
+
+        // アニメーション
+        if (mixer) {
+            mixer.update(clock.getDelta());
+        }
     }
+}
+
+function onWindowResize() {
+    camera!!.aspect = window.innerWidth / window.innerHeight;
+    camera!!.updateProjectionMatrix();
+
+    renderer!!.setSize(window.innerWidth, window.innerHeight);
+}
+
+export function loadHDR(value: number | null) {
+    let hdrPath = "";
+    switch (value) {
+        case 0:
+            hdrPath = 'empty_workshop_4k.hdr';
+            break;
+        case 1:
+            hdrPath = 'lilienstein_4k.hdr';
+            break;
+        default:
+            hdrPath = 'empty_workshop_4k.hdr';
+            break;
+    }
+    new RGBELoader()
+        .setPath('hdr/')
+        .load(hdrPath, function (texture) {
+
+            texture.mapping = THREE.EquirectangularReflectionMapping;
+
+            scene!!.background = texture;
+            scene!!.environment = texture;
+            texture.dispose();
+
+        });
 }
 
 export function loadGLB(objectUrl: string) {
@@ -79,9 +123,12 @@ export function loadGLB(objectUrl: string) {
     // GLTFファイルのパスを指定
     loader.load(objectUrl, (gltf) => {
         // 読み込み後に3D空間に追加
-        const model = gltf.scene;
+        model = gltf.scene;
+        animations = gltf.animations;
         currentGLB = model;
+        mixer = new THREE.AnimationMixer(currentGLB);
 
+        // 画面に合わせて位置調整＆スケール
         currentGLB.updateMatrixWorld();
 
         const box = new THREE.Box3().setFromObject(currentGLB);
@@ -98,6 +145,33 @@ export function loadGLB(objectUrl: string) {
 
         currentGLB.scale.set(modelScale, modelScale, modelScale);
 
+        const animations_element = document.getElementById("animations");
+        animations_element!!.innerHTML = '<div><label><input type="radio" name="animations" value="-1" checked />初期状態</label></div >';
+        if (animations && animations.length) {
+            for (let index = 0; index < animations.length; index++) {
+                animations_element!!.innerHTML += `<div><label><input type="radio" name="animations" value="${index}"/>${animations[index].name}</label></div >`;
+            }
+        }
+
         scene!!.add(currentGLB);
     });
+}
+
+export function loadAnimation(value: number) {
+    if (action) {
+        action.stop();
+    }
+
+    if (value == -1 || value >= animations.length) {
+        return
+    }
+
+
+    //Animation Actionを生成
+    action = mixer.clipAction(animations[value]);
+
+    action.setLoop(THREE.LoopRepeat, Infinity);
+
+    //アニメーションを再生
+    action.play();
 }
