@@ -20,16 +20,26 @@
         <ul id="optionList">
             <li>
                 <dl>
-                    <dt>操作説明</dt>
-                    <dd>
-                        サンプルテキスト
+                    <dt class="optionHead">操作説明</dt>
+                    <dd class="hidden">
+                        <ol>
+                            <li>
+                                ドラッグアンドドロップメニューを開き、GLTFのフォルダかGLBファイルをインポートする
+                            </li>
+                            <li>
+                                HDRの切り替えで背景のHDRを変更
+                            </li>
+                            <li>
+                                アニメーションの切り替えにモデルに設定されたアニメーションが表示され、変更可能。
+                            </li>
+                        </ol>
                     </dd>
                 </dl>
             </li>
             <li>
                 <dl>
-                    <dt>HDRの切り替え</dt>
-                    <dd>
+                    <dt class="optionHead">HDRの切り替え</dt>
+                    <dd class="hidden">
                         <div>
                             <input type="radio" id="empty_workshop_4k" name="hdr" value="0" checked />
                             <label for="empty_workshop_4k">empty_workshop_4k.hdr</label>
@@ -43,8 +53,8 @@
             </li>
             <li>
                 <dl>
-                    <dt>アニメーションの切り替え</dt>
-                    <dd id="animations">
+                    <dt class="optionHead">アニメーションの切り替え</dt>
+                    <dd id="animations" class="hidden">
                         <div><label><input type="radio" name="animations" value="-1" checked />初期状態</label></div>
                     </dd>
                 </dl>

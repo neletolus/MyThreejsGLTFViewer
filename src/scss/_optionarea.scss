@@ -5,7 +5,7 @@
     z-index: 100;
     width: 300px;
     padding: 5px;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.8);
 }
 
 #optionList {
@@ -21,6 +21,7 @@
 
         dt {
             padding: 5px 5px 5px 10px;
+            cursor: pointer;
 
             &::before {
                 content: "";
@@ -48,6 +49,21 @@
                     border: 5px solid rgba(0, 0, 0, 0);
                     border-top: 5px solid #000;
                 }
+            }
+        }
+
+        dd {
+            margin-bottom: 10px;
+            padding-left: 10px;
+
+            color: #333;
+
+            ol {
+                padding-left: 20px;
+            }
+
+            &.hidden {
+                display: none;
             }
         }
     }

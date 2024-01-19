@@ -9,27 +9,19 @@ function init() {
     dropZone?.addEventListener('dragover', handleDragOver, false);
     dropZone?.addEventListener('drop', handleFileSelect, false);
 
-    const dropMenu = document.getElementById("drop_menu");
-    dropMenu?.addEventListener("click", function () {
-        if (dropMenu.classList.contains("opened")) {
-            dropMenu.classList.remove("opened");
-            dropZone?.classList.add("hidden");
-        } else {
-            dropMenu.classList.add("opened");
-            dropZone?.classList.remove("hidden");
-        }
-    });
-
-    const radio_btns = document.querySelectorAll("input[type='radio'][name='hdr']");
-
-    for (let index = 0; index < radio_btns.length; index++) {
-        const target = radio_btns[index] as HTMLInputElement
-        target.addEventListener('change', function () {
-            if (target.checked) {
-                loadHDR(parseInt(target.value))
+    document.addEventListener('click', function (event) {
+        const target = event.target as HTMLElement;
+        if (target.id === "drop_menu" || target.classList.contains("optionHead")) {
+            const nextElement = target.nextElementSibling
+            if (target.classList.contains("opened")) {
+                target.classList.remove("opened");
+                nextElement?.classList.add("hidden");
+            } else {
+                target.classList.add("opened");
+                nextElement?.classList.remove("hidden");
             }
-        });
-    }
+        }
+    })
 
     document.addEventListener('change', function (event) {
         try {
@@ -49,10 +41,6 @@ function init() {
 
         }
     })
-
-
-
-    // todo: 右側のオプションアコーディオン群の処理
 
     renderView();
 }

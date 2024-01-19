@@ -5,7 +5,7 @@
     z-index: 100;
     width: 300px;
     padding: 5px;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.8);
 }
 
 #drop_menu {
@@ -53,7 +53,7 @@
     padding: 10px;
     text-align: center;
     font-size: 14px;
-    color: #000;
+    color: #333;
 
     &.hidden {
         display: none;
