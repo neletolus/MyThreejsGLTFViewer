@@ -1,6 +1,9 @@
 import { loadGLB } from "./renderView";
 /**
  * GLTFファイルと必要なファイル群をGLBにまとめる処理のjs
+ * 下記を参考に作成
+ * GLTFをGLBに変換した後loadGLBに流し込むまで対応している。
+ * https://github.com/sbtron/makeglb
  */
 let gltf: any;
 let glb: File | null;

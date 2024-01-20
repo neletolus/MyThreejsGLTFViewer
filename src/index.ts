@@ -5,10 +5,12 @@ import { renderView, loadHDR, loadAnimation } from "./renderView";
 window.addEventListener("DOMContentLoaded", init);
 
 function init() {
+    // ドラッグアンドドロップのイベント
     const dropZone = document.getElementById("drop_zone");
     dropZone?.addEventListener('dragover', handleDragOver, false);
     dropZone?.addEventListener('drop', handleFileSelect, false);
 
+    // アコーディオンメニューの開閉
     document.addEventListener('click', function (event) {
         const target = event.target as HTMLElement;
         if (target.id === "drop_menu" || target.classList.contains("optionHead")) {
@@ -23,6 +25,7 @@ function init() {
         }
     })
 
+    // ラジオボタンの変更イベント
     document.addEventListener('change', function (event) {
         try {
             const target = event.target as HTMLInputElement;
@@ -36,9 +39,8 @@ function init() {
                 }
             }
         } catch (error) {
-            // 不要のため握りつぶす
+            // HTMLInputElementでないとき用。不要のため握りつぶす
             console.log(error);
-
         }
     })
 
